@@ -1,4 +1,4 @@
-# Rendering setcions with an other format
+# Rendering sections with an additional format
 
 Rendeer supports rendering other formats insided the markdown text.
 An additional format can be included in a section which starts with -- at the start of a line ends with -- at the start of a line.
