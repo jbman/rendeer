@@ -9,7 +9,7 @@
   };
   
   var renderFunction = function(csvText) {
-    var lines, firstLine, thtd, out;
+    var lines, firstLine, out;
     
     out = "<table>";
     lines = csvText.split(/[\n\r]+/);
@@ -18,6 +18,8 @@
 
     lines.forEach(function(line)
     {
+      var fCell;
+      
       // Ignore empty lines
       if(!line.match(/\S/)) {
         return;
@@ -28,16 +30,20 @@
       // First line specifies headers and number of columns
       if (!firstLine) {
         firstLine = line;
-        thtd = "th";
+        fCell = function(cellText) {
+          return '<th scope="col">' + cellText + '</th>';
+        };
       }
       else { 
-        thtd = "td";
+        fCell = function(cellText) {
+          return '<td>' + cellText + '</td>';
+        };
       }
 
       out += "<tr>";
       cells.forEach(function(cell)
       {
-        out += "<" + thtd + ">" + cell.trim() + "</" + thtd +">";
+        out +=  fCell(cell.trim());
       });
       out += "</tr>";
     });
