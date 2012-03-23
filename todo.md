@@ -1,8 +1,7 @@
 # Things to do
 
-1. Navigation concept
-  * Relative links should replace current content
-  * Menu: Links should place content in a specified element (specified in HTML)
+1. Naviagtion: 
+  * Check if link is a relative link and ends with a specified suffix (Default should be: .md and .txt)
 1. Finish plugin mechnaism to render other formats (e.g. csv as table)
   * CSV is hard coded
   * Allow rendiering of linked files not only inline setcions

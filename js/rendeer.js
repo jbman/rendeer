@@ -38,12 +38,25 @@ var rendeer = (function($) {
       text = text.replace(regexp, fConvertOther);
       return text;
     };
-            
-    // Converts the markdown input string to an HTML string.
+    
+    var fEnhanceLinksWithClickHandler = function(htmlText) {
+      htmlText = htmlText.replace(/href="(.*md)"([^>]*)/g, 
+        "onclick=\"rendeer.renderInto($('#content'), '$1');\" href=\"#rendeer.renderInto\"$2");
+      return htmlText;
+    };
+    
+    // Converts the markdown input string to a HTML string.
+    // Parameters:
+    //   markdown - String containing the markdown text which should be converted to HTML
+    // Returns:
+    //   String containing the resulting HTML.
     var fConvert = function(markdown) {
+      var htmlText;
       console.debug("Convert markdown to HTML");
       markdown = fConvertOtherFormats(markdown);
-      return converter.makeHtml(markdown);
+      htmlText = converter.makeHtml(markdown);
+      htmlText = fEnhanceLinksWithClickHandler(htmlText);
+      return htmlText;
     };
 
     // Loads the given fileUrl as text and calls the fSuccess function.
@@ -57,21 +70,39 @@ var rendeer = (function($) {
                 xhr.overrideMimeType("text/plain");
             }
           },
-        success: fSuccess
+        success: function(data) {
+          console.debug("Loaded content of URL %s", fileUrl);
+          fSuccess(data)
+        }
       });
     };
 
-    // Each link with CSS class 'rendeerr' is loaded, converted and included in the current DOM.
+    that.renderInto = function(targetNode, markdownUrl) {
+      fLoadAsText(markdownUrl, function(data) {
+        var html = fConvert(data);
+        console.debug("'Append HTML to %o", targetNode.get());
+        targetNode.hide();
+        targetNode.empty();
+        targetNode.append(html);
+        targetNode.fadeIn(300);
+      });
+    };
+
+    // Loads and renders a markdown text to HTML and replaces the given jQuery targetNode.
+    var fLoadAndReplace = function(targetNode, markdownUrl) {
+      console.debug("Load and render file %s into element %o", markdownUrl, targetNode.get());
+      fLoadAsText(markdownUrl, function(data) {
+        var html = fConvert(data);
+        console.debug("'Replace element %o", targetNode.get());
+        targetNode.replaceWith(html);
+      });
+    };
+
+    // Each link with CSS class 'rendeer' is loaded, converted and included in the current DOM.
     $('.rendeer').each(function(index) {
       var aNode = $(this);
       var hrefVal = aNode.attr("href");
-      console.debug("Load and render file %s into element %o", hrefVal, aNode.get());
-      fLoadAsText(hrefVal, function(data) {
-        console.debug("Loaded content of file", hrefVal);
-        var html = fConvert(data);
-        console.debug("'Replace element %o", aNode.get());
-        aNode.replaceWith(html);
-      })
+      fLoadAndReplace(aNode, hrefVal);
     });
   };
 
